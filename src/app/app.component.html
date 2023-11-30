@@ -1,6 +1,17 @@
 <!-- <div class="d-flex justify-content-center">
-  
-    <h1>Current Number: {{ currentNumber }}</h1>
-    <h2>Next number in: {{ countdown }} seconds</h2>
+  <h1>Current Number: {{ currentNumber }}</h1>
+  <h2>Next number in: {{ countdown }} seconds</h2>
 </div> -->
 
+<div
+  *ngFor="let ticket of boardNumbers; let ticketIndex = index"
+  class="tambola-ticket"
+>
+  <table>
+    <tr *ngFor="let row of ticket; let rowIndex = index">
+      <td *ngFor="let number of row; let numberIndex = index">
+        {{ number !== 0 ? number : "&nbsp;" }}
+      </td>
+    </tr>
+  </table>
+</div>

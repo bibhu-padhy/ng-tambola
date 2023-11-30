@@ -1,68 +1,22 @@
-/* ticket.component.css */
-
-.ticket {
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  grid-gap: 5px;
-  border-collapse: collapse; /* For better border handling */
+.tambola-ticket {
+  margin: 10px;
+  padding: 5px;
 }
 
-.ticket-row {
-  display: contents;
+table {
+  border-collapse: collapse;
+  margin: auto;
 }
 
-.ticket-cell {
-  border: 1px solid #000; /* Solid black border */
-  padding: 10px; /* Adjust padding as needed */
-  text-align: center; /* Center the number in the cell */
-  
-  /* Optional styles */
-  background-color: #fff; /* Background color for the cell */
-  min-height: 50px; /* Adjust height as needed */
-}
-
-/* Additional styling for marked cells */
-.ticket-cell.marked {
-  background-color: #4CAF50; /* Change background for marked cells */
-  color: #fff; /* Change text color for better visibility */
-}
-
-
-/* game-board.component.css */
-
-.game-board {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr); /* 10 columns */
-  grid-gap: 5px;
-}
-
-.number-cell {
-  border: 1px solid #000;
-  padding: 10px;
+td {
+  border: 1px solid black;
+  width: 30px;
+  height: 30px;
   text-align: center;
-  background-color: #fff;
+  vertical-align: middle;
+  background-color: #fff; /* White background for number cells */
 }
 
-.number-cell.called {
-  background-color: #4CAF50; /* Green background for called numbers */
-  color: #fff;
-}
-/* game-board.component.css */
-
-.called-numbers {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.number-cell {
-  border: 1px solid #000;
-  padding: 10px;
-  margin: 5px;
-  text-align: center;
-  min-width: 30px;
-}
-
-/* Style for the most recently called number */
-.number-cell:last-child {
-  background-color: #ffcc00; /* Highlight color */
+td:empty {
+  background-color: #f0f0f0; /* Light grey background for empty cells */
 }
