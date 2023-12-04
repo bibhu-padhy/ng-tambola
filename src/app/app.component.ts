@@ -2,14 +2,14 @@ import { Component } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { RandomNumberService } from './services/random-number.service';
 import { PlayerTicket, TicketService } from './ticket.service';
-import { BoardNumber, GameBoardService } from './game-board.service';
+import { BoardNumber, GameBoardService, cell } from './game-board.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  boardNumbers: number[][][] = [];
+  boardNumbers: number[][] = [];
   tickets: PlayerTicket = [];
   currentNumber: number | null = null;
   countdown = 30; // Countdown from 30 seconds
@@ -19,7 +19,7 @@ export class AppComponent {
     private randomNumberService: RandomNumberService,
     private ticketService: TicketService,
     private gameBoardService: GameBoardService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // this.subscription = interval(1000).subscribe(() => {
@@ -30,11 +30,15 @@ export class AppComponent {
     //     this.currentNumber = this.randomNumberService.getNextNumber();
     //   }
     // });
-    this.boardNumbers = this.gameBoardService.generateBoard();
-    console.log(this.gameBoardService.generateBoard());
+    this.refreshBoard()
   }
 
   ngOnDestroy() {
     this.subscription?.unsubscribe();
+  }
+
+  refreshBoard() {
+    this.boardNumbers = this.gameBoardService.generateBoard();
+    console.log(this.boardNumbers);
   }
 }
