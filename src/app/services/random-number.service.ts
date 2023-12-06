@@ -23,12 +23,12 @@ export class RandomNumberService {
     }
   }
 
-  getNextNumber(): number | null {
+  getNextNumber(): number {
     if (this.currentIndex < this.numbers.length) {
       const nextNumber = this.numbers[this.currentIndex];
       this.currentIndex++;
       return nextNumber;
     }
-    return null; 
+    return 0; 
   }
 }

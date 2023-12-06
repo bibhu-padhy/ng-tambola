@@ -1,17 +1,17 @@
-<!-- <div class="d-flex justify-content-center">
+<div class="d-flex justify-content-center">
   <h1>Current Number: {{ currentNumber }}</h1>
-  <h2>Next number in: {{ countdown }} seconds</h2>
-</div> -->
-<button (click)="refreshBoard()" >Refresh</button>
-<!-- <div
-  *ngFor="let ticket of boardNumbers; let ticketIndex = index"
+  <h2>{{ countdown }} seconds</h2>
+</div>
+<button (click)="refreshBoard()">Refresh</button>
+<div
+  *ngFor="let ticket of boardNumbers | async; let ticketIndex = index"
   class="tambola-ticket"
 >
   <table>
     <tr *ngFor="let row of ticket; let rowIndex = index">
-      <td *ngFor="let number of row; let numberIndex = index">
-        {{ number.value}}
+      <td *ngFor="let r of row; let numberIndex = index">
+        {{ r.number }}
       </td>
     </tr>
   </table>
-</div> -->
+</div>

@@ -1,105 +1,97 @@
-// game-board.service.ts
 import { Injectable } from '@angular/core';
-
+import { BehaviorSubject, Observable } from 'rxjs';
 export interface BoardNumber {
   number: number;
   called: boolean;
 }
 
-export interface cell {
-  value: number;
-  isZero: boolean;
-  index: number
+export interface Cell {
+  number: number;
+  selected: boolean;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameBoardService {
-  currentColumn: number[] = [];
-  generateBoard(): number[][] {
-    const ticketsCount = 6;
-    const rowsPerTicket = 3;
-    const colsPerTicket = 9;
-    const numbersPerRow = 5;
-    const numbersPerTicket = 15;
-    let boardNumbers: any[][] = [];
-    let ticketBoard:any = []
+  private readonly BOARD_SIZE = 9;
+  private readonly COLUMN_SIZE = 18;
+  private readonly TICKER_SIZE = 3;
 
-    console.log(boardNumbers);
+  private boardNumbers = new BehaviorSubject([] as Cell[][][]);
 
-    for (let index = 0; index < 9; index++) {
-      const column = Array.from({ length: 18 }, () => Array(1).fill(0));
-      const columnNumbers = this.shuffleArray(this.range(index));
-      for (let j = 0; j < column.length; j++) {
+  generateBoardNumbers(): Observable<Cell[][][]> {
+    return this.boardNumbers.asObservable();
+  }
 
-        if (index % 2 === 0) {
-          if (j % 2 === 0 ) {
-            column[j][0] = columnNumbers.shift()
-          }
-        }
+  generateBoard() {
+    const boardNumbers: number[][] = this.generateBoardNumbersColumns();
+    const ticketBoard: Cell[][][] = [];
 
-        if (index % 2 !== 0) {
-          if (j % 2 !== 0 ) {
-            column[j][0] = columnNumbers.shift()
-          }
-        }
+    for (let i = 0; i < boardNumbers[0].length; i += this.TICKER_SIZE) {
+      const ticketGroup: Cell[][] = [];
 
+      for (let j = 0; j < this.TICKER_SIZE; j++) {
+        const ticket = boardNumbers
+          .map((column) => ({ number: column[i + j], selected: false }))
+          .flat();
+        ticketGroup.push(ticket);
       }
-      boardNumbers.push(column)
+      console.log(ticketGroup);
+      
+      ticketBoard.push(ticketGroup);
     }
-    boardNumbers = boardNumbers.map(a => a.flat(2));
-    
-    console.log(this.rotateArray90Degrees(boardNumbers));
-    
-this.reshapeArray(this.rotateArray90Degrees(boardNumbers)).forEach(ticket=>{
-  
-  ticket.forEach(t=>{
-    console.log(t);
-    
-    ticketBoard.push(t)
-  })
-})
+    this.boardNumbers.next(ticketBoard);
+  }
 
-console.log(ticketBoard);
+  selectNumber(number: number): void {
+    const currentBoard = this.boardNumbers.value;
+    console.log(number);
+    
+    // Loop through tickets and set 'selected' property for the matching number
+    for (const ticketGroup of currentBoard) {
+      for (const ticket of ticketGroup) {
+        const matchingNumber = ticket.find((cell) => {
+          // console.log(cell);
+          
+          return cell.number === number
+        });
 
+        if (matchingNumber) {
+          matchingNumber.selected = true;
+        }
+        console.log(matchingNumber);
+      }
+    }
+    console.log(currentBoard);
+
+    // Update the BehaviorSubject with the modified board
+    this.boardNumbers.next(currentBoard);
+  }
+
+  private generateBoardNumbersColumns(): number[][] {
+    const boardNumbers: any[][] = [];
+    for (let columnIndex = 0; columnIndex < this.BOARD_SIZE; columnIndex++) {
+      const column = Array.from({ length: this.COLUMN_SIZE }, () =>
+        Array(1).fill(0)
+      );
+      const columnNumbers = this.shuffleArray(this.range(columnIndex));
+
+      for (let j = 0; j < this.COLUMN_SIZE; j++) {
+        const isEvenColumn = columnIndex % 2 === 0;
+        const isEvenIndex = j % 2 === 0;
+
+        if ((isEvenColumn && isEvenIndex) || (!isEvenColumn && !isEvenIndex)) {
+          column[j][0] = columnNumbers.shift();
+        }
+      }
+
+      boardNumbers.push(column);
+    }
     return boardNumbers;
   }
 
-  // Function to rotate the array 90 degrees clockwise
-  rotateArray90Degrees(array:number[][]) {
-    const rows = array.length;
-    const columns = array[0].length;
-    const rotatedArray:number[][] = [];
-  
-    for (let i = 0; i < columns; i++) {
-      rotatedArray.unshift([]); // Unshift is used to add rows at the beginning
-      for (let j = 0; j < rows; j++) {
-        rotatedArray[0].push(array[j][i]);
-      }
-    }
-  
-    return rotatedArray;
-  }
-
-// Function to reshape the array into a 3D array with tickers
-reshapeArray(array: number[][]): number[][][] {
-  const tickerSize = 3;
-  const rowsPerTicker = tickerSize * 2; // 2 tickers per group
-  const tickerGroups: number[][][] = [];
-
-  for (let i = 0; i < array.length; i += rowsPerTicker) {
-    const tickerGroup: any[][] = [];
-    for (let j = 0; j < tickerSize; j++) {
-      tickerGroup.push([...array.slice(i + j * tickerSize, i + (j + 1) * tickerSize)]);
-    }
-    tickerGroups.push(tickerGroup);
-  }
-
-  return tickerGroups;
-}
-
-  // The range function remains unchanged
+  // Other methods remain unchanged...
 
   private range(index: number): number[] {
     const ranges = [
@@ -113,7 +105,10 @@ reshapeArray(array: number[][]): number[][][] {
       { start: 70, end: 79 },
       { start: 80, end: 90 },
     ];
-    return Array.from({ length: ranges[index].end - ranges[index].start + 1 }, (_, i) => ranges[index].start + i);
+    return Array.from(
+      { length: ranges[index].end - ranges[index].start + 1 },
+      (_, i) => ranges[index].start + i
+    );
   }
 
   private shuffleArray(array: number[]): number[] {
