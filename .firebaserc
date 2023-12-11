@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "tambola-xyz"
+  },
+  "targets": {
+    "tambola-xyz": {
+      "hosting": {
+        "ng-tambola": [
+          "tambola-xyz"
+        ]
+      }
+    }
   }
 }
