@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-export interface BoardNumber {
-  number: number;
-  called: boolean;
-}
 
 export interface Cell {
   number: number;
@@ -16,82 +12,70 @@ export interface Cell {
 export class GameBoardService {
   private readonly BOARD_SIZE = 9;
   private readonly COLUMN_SIZE = 18;
-  private readonly TICKER_SIZE = 3;
+  private readonly TICKET_SIZE = 3;
 
-  private boardNumbers = new BehaviorSubject([] as Cell[][][]);
+  private boardNumbers = new BehaviorSubject<Cell[][][]>([]);
 
   generateBoardNumbers(): Observable<Cell[][][]> {
     return this.boardNumbers.asObservable();
   }
 
   generateBoard() {
-    const boardNumbers: number[][] = this.generateBoardNumbersColumns();
+    const boardNumbers: Cell[][] = this.generateBoardNumbersColumns();
     const ticketBoard: Cell[][][] = [];
 
-    for (let i = 0; i < boardNumbers[0].length; i += this.TICKER_SIZE) {
+    for (let i = 0; i < this.COLUMN_SIZE; i += this.TICKET_SIZE) {
       const ticketGroup: Cell[][] = [];
 
-      for (let j = 0; j < this.TICKER_SIZE; j++) {
-        const ticket = boardNumbers
-          .map((column) => ({ number: column[i + j], selected: false }))
-          .flat();
+      for (let j = 0; j < this.TICKET_SIZE; j++) {
+        const ticket = boardNumbers.map(column => column[i + j]);
         ticketGroup.push(ticket);
       }
-      console.log(ticketGroup);
-      
+
       ticketBoard.push(ticketGroup);
     }
+    console.log(ticketBoard);
+
     this.boardNumbers.next(ticketBoard);
   }
 
   selectNumber(number: number): void {
     const currentBoard = this.boardNumbers.value;
-    console.log(number);
-    
-    // Loop through tickets and set 'selected' property for the matching number
-    for (const ticketGroup of currentBoard) {
-      for (const ticket of ticketGroup) {
-        const matchingNumber = ticket.find((cell) => {
-          // console.log(cell);
-          
-          return cell.number === number
-        });
 
-        if (matchingNumber) {
-          matchingNumber.selected = true;
+    currentBoard.forEach(ticketGroup => {
+      ticketGroup.forEach(ticket => {
+        const matchingCell = ticket.find(cell => cell.number === number);
+        if (matchingCell) {
+          matchingCell.selected = true;
         }
-        console.log(matchingNumber);
-      }
-    }
+      });
+    });
+
     console.log(currentBoard);
 
-    // Update the BehaviorSubject with the modified board
+
     this.boardNumbers.next(currentBoard);
   }
 
-  private generateBoardNumbersColumns(): number[][] {
-    const boardNumbers: any[][] = [];
+  private generateBoardNumbersColumns(): Cell[][] {
+    const boardNumbers: Cell[][] = Array.from({ length: this.BOARD_SIZE }, () => []);
+
     for (let columnIndex = 0; columnIndex < this.BOARD_SIZE; columnIndex++) {
-      const column = Array.from({ length: this.COLUMN_SIZE }, () =>
-        Array(1).fill(0)
-      );
       const columnNumbers = this.shuffleArray(this.range(columnIndex));
+      const column: Cell[] = Array.from({ length: this.COLUMN_SIZE }, (_, i) => ({
+        number: i % 2 === columnIndex % 2 ? columnNumbers.shift() ?? 0 : 0,
+        selected: false
+      }));
 
-      for (let j = 0; j < this.COLUMN_SIZE; j++) {
-        const isEvenColumn = columnIndex % 2 === 0;
-        const isEvenIndex = j % 2 === 0;
-
-        if ((isEvenColumn && isEvenIndex) || (!isEvenColumn && !isEvenIndex)) {
-          column[j][0] = columnNumbers.shift();
-        }
-      }
-
-      boardNumbers.push(column);
+      boardNumbers[columnIndex] = column;
     }
+
     return boardNumbers;
   }
 
-  // Other methods remain unchanged...
+
+
+
 
   private range(index: number): number[] {
     const ranges = [

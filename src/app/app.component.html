@@ -9,7 +9,7 @@
 >
   <table>
     <tr *ngFor="let row of ticket; let rowIndex = index">
-      <td *ngFor="let r of row; let numberIndex = index">
+      <td *ngFor="let r of row; let numberIndex = index" [ngStyle]="{'background-color': r.selected ? 'cyan' : 'white' }">
         {{ r.number }}
       </td>
     </tr>
